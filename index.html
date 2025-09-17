@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Logic Trainer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css" />
+  <script type="importmap">
+  {
+    "imports": {
+      // no external libs needed for this app
+    }
+  }
+  </script>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <div class="stat"><span class="label">Time</span><span id="time">60</span>s</div>
+      <div class="stat"><span class="label">Score</span><span id="score">0</span></div>
+      <div class="stat"><span class="label">Correct</span><span id="correct">0</span></div>
+      <div class="stat"><span class="label">Wrong</span><span id="wrong">0</span></div>
+      <div class="legend">
+        <span class="op and">^</span> AND
+        <span class="sep">·</span>
+        <span class="op or">V</span> OR
+        <span class="sep">·</span>
+        <span class="op not">¬</span> NOT
+      </div>
+    </header>
+
+    <main class="game">
+      <div class="expression" id="expression">(T <span class="op and">^</span> F) <span class="op or">V</span> <span class="op not">¬</span>(T <span class="op and">^</span> T)</div>
+      <div class="controls">
+        <button id="btnTrue" class="btn primary">T</button>
+        <button id="btnFalse" class="btn">F</button>
+      </div>
+      <div class="hint" id="hint">Answer True or False</div>
+    </main>
+
+    <footer class="footer">
+      <button id="startBtn" class="btn outline">Start</button>
+      <button id="restartBtn" class="btn outline" hidden>Play Again</button>
+    </footer>
+  </div>
+
+  <script type="module" src="main.js"></script>
+</body>
+</html>
