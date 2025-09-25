@@ -31,9 +31,41 @@ body {
 .btn[disabled] { opacity: .5; cursor: not-allowed; transform: none; }
 .hint { color: var(--muted); font-size: 14px; }
 .footer { display: flex; gap: 10px; justify-content: center; padding-top: 8px; border-top: 1px solid var(--border); }
+.settings { display: flex; gap: 12px; align-items: center; }
+.settings label { color: var(--muted); font-size: 14px; display: flex; gap: 6px; align-items: center; }
+.settings input[type="number"] { width: 72px; padding: 6px 8px; border: 1px solid var(--border); border-radius: 8px; font: inherit; }
 .op { font-weight: 700; }
 .op.and { color: #0f62fe; }
 .op.or { color: #10b981; }
 .op.not { color: #ef4444; }
+.op-big { font-size: 48px; line-height: 1; font-weight: 700; }
+.op-big.and { color: #0f62fe; }
+.op-big.or { color: #10b981; }
+.op-big.not { color: #ef4444; }
+.op-big.imp { color: #111; }
+.op-big.le { color: #0f62fe; }
+.op-big.eq { color: #6b7280; }
+.op.le { color: #0f62fe; }
+.op.eq { color: #6b7280; }
+.op-desc { color: var(--muted); font-size: 13px; text-align: center; padding: 6px 8px; }
 .legend { display: flex; gap: 10px; align-items: center; color: var(--muted); font-size: 14px; }
 .legend .sep { color: #d1d5db; }
+.home { display: grid; gap: 16px; padding: 8px 0; }
+.home h1 { margin: 0; font-size: 28px; }
+.sub { color: var(--muted); margin: 0; }
+.shop, .ops-select { border: 1px solid var(--border); border-radius: 10px; padding: 12px; }
+.shop-item { display: flex; gap: 10px; align-items: center; justify-content: space-between; }
+.badge { font-size: 12px; color: var(--muted); }
+.tag { font-size: 12px; color: #10b981; }
+.op.imp { color: #111; font-weight: 700; }
+.shop-grid, .ops-grid { display: grid; gap: 12px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+.card { border: 1px solid var(--border); border-radius: 12px; padding: 12px; display: grid; place-items: center; gap: 6px; transition: border-color .15s ease, box-shadow .15s ease; }
+.shop-card { grid-auto-rows: min-content; align-content: center; }
+.op-card { cursor: pointer; user-select: none; }
+.op-card.selected { border-color: #0ea5e9; box-shadow: 0 0 0 2px rgba(14,165,233,0.2); }
+.op-card.locked { cursor: default; }
+.op-card.locked .badge { color: var(--muted); }
+.card-info .name { font-weight: 600; }
+.card-info .price { color: var(--muted); font-size: 14px; }
+.card-actions { display: flex; gap: 8px; align-items: center; }
+.account { border: 1px solid var(--border); border-radius: 10px; padding: 10px; display: grid; gap:8px; }

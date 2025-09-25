@@ -16,22 +16,149 @@
 </head>
 <body>
   <div class="app">
+    <!-- HOME VIEW -->
+    <section id="homeView" class="home" aria-hidden="false">
+      <h1>Logic Trainer</h1>
+      <p class="sub">Train with T/F and logic operators.</p>
+      <div class="home-stats">
+        <div><span class="label">Total Score</span> <span id="homeTotal">0</span></div>
+      </div>
+      <div class="account">
+        <h3>Account</h3>
+        <div id="acctInfo">
+          <div id="acctLoggedOut">
+            <div class="home-actions">
+              <button id="openLoginBtn" class="btn outline">Login</button>
+              <button id="openSignupBtn" class="btn">Sign Up</button>
+            </div>
+          </div>
+          <!-- Separate login "page" -->
+          <div id="acctLoginView" hidden>
+            <input id="loginViewLogin" placeholder="Login" />
+            <input id="loginViewPass" type="password" placeholder="Password" />
+            <div class="home-actions">
+              <button id="loginViewBtn" class="btn">Sign In</button>
+              <button id="loginBackBtn" class="btn outline">Back</button>
+            </div>
+          </div>
+          <!-- Separate signup "page" -->
+          <div id="acctCreateView" hidden>
+            <input id="createLogin" placeholder="Choose login" />
+            <input id="createPass" type="password" placeholder="Choose password" />
+            <div class="home-actions">
+              <button id="createBtn" class="btn">Create Account</button>
+              <button id="createBackBtn" class="btn outline">Back</button>
+            </div>
+          </div>
+          <div id="acctLoggedIn" hidden>
+            <div>Signed in as <strong id="acctName"></strong></div>
+            <div class="home-actions">
+              <button id="acctLogoutBtn" class="btn outline">Logout</button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="shop">
+        <h2>Shop</h2>
+        <div class="shop-grid">
+          <div class="card shop-card">
+            <div class="op-big imp">→</div>
+            <div class="card-info">
+              <div class="name">Implication</div>
+              <div class="price">120 pts</div>
+            </div>
+            <div class="op-desc">Implication: X → Y — if X is true then Y must be true.</div>
+            <div class="card-actions">
+              <button id="buyImpBtn" class="btn outline">Buy</button>
+              <span id="impOwnedTag" class="tag" hidden>Owned</span>
+            </div>
+          </div>
+          <div class="card shop-card">
+            <div class="op-big le">←</div>
+            <div class="card-info">
+              <div class="name">Reverse Imp (LE)</div>
+              <div class="price">120 pts</div>
+            </div>
+            <div class="op-desc">Reverse Implication: X ← Y — if Y is false then X is false (Y → X).</div>
+            <div class="card-actions">
+              <button id="buyLeBtn" class="btn outline">Buy</button>
+              <span id="leOwnedTag" class="tag" hidden>Owned</span>
+            </div>
+          </div>
+          <div class="card shop-card">
+            <div class="op-big eq">↔</div>
+            <div class="card-info">
+              <div class="name">Equivalence (EQ)</div>
+              <div class="price">120 pts</div>
+            </div>
+            <div class="op-desc">Equivalence: X ↔ Y — X and Y have the same truth value (both true or both false).</div>
+            <div class="card-actions">
+              <button id="buyEqBtn" class="btn outline">Buy</button>
+              <span id="eqOwnedTag" class="tag" hidden>Owned</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="ops-select">
+        <h2>Operators</h2>
+        <div class="ops-grid">
+          <div class="card op-card selected locked" aria-pressed="true">
+            <div class="op-big and">∧</div>
+            <div class="name">AND</div>
+            <div class="badge">Required</div>
+          </div>
+          <div class="card op-card selected locked" aria-pressed="true">
+            <div class="op-big or">∨</div>
+            <div class="name">OR</div>
+            <div class="badge">Required</div>
+          </div>
+          <div class="card op-card selected locked" aria-pressed="true">
+            <div class="op-big not">¬</div>
+            <div class="name">NOT</div>
+            <div class="badge">Required</div>
+          </div>
+          <div id="opImpCard" class="card op-card" hidden aria-pressed="false">
+            <div class="op-big imp">→</div>
+            <div class="name">IMP</div>
+            <div class="badge">Optional</div>
+          </div>
+          <div id="opLeCard" class="card op-card" hidden aria-pressed="false">
+            <div class="op-big le">←</div>
+            <div class="name">LE</div>
+            <div class="badge">Optional</div>
+          </div>
+          <div id="opEqCard" class="card op-card" hidden aria-pressed="false">
+            <div class="op-big eq">↔</div>
+            <div class="name">EQ</div>
+            <div class="badge">Optional</div>
+          </div>
+        </div>
+      </div>
+      <div class="home-actions">
+        <button id="homeStartBtn" class="btn primary">Start Game</button>
+      </div>
+    </section>
+
     <header class="topbar">
       <div class="stat"><span class="label">Time</span><span id="time">60</span>s</div>
       <div class="stat"><span class="label">Score</span><span id="score">0</span></div>
       <div class="stat"><span class="label">Correct</span><span id="correct">0</span></div>
       <div class="stat"><span class="label">Wrong</span><span id="wrong">0</span></div>
+      <div class="stat"><span class="label">Pts/Ans</span><span id="ptsPerAnswer">0</span></div>
+      <div class="stat"><span class="label">Total</span><span id="totalScore">0</span></div>
       <div class="legend">
-        <span class="op and">^</span> AND
+        <span class="op and">∧</span> AND
         <span class="sep">·</span>
-        <span class="op or">V</span> OR
+        <span class="op or">∨</span> OR
         <span class="sep">·</span>
         <span class="op not">¬</span> NOT
+        <span class="sep">·</span>
+        <span id="impLegend" class="op imp" hidden>→</span> <span id="impLegendText" hidden>IMP</span>
       </div>
     </header>
 
-    <main class="game">
-      <div class="expression" id="expression">(T <span class="op and">^</span> F) <span class="op or">V</span> <span class="op not">¬</span>(T <span class="op and">^</span> T)</div>
+    <main class="game" id="gameView" aria-hidden="true">
+      <div class="expression" id="expression">(T <span class="op and">∧</span> F) <span class="op or">∨</span> <span class="op not">¬</span>(T <span class="op and">∧</span> T)</div>
       <div class="controls">
         <button id="btnTrue" class="btn primary">T</button>
         <button id="btnFalse" class="btn">F</button>
@@ -40,7 +167,17 @@
     </main>
 
     <footer class="footer">
+      <div class="settings">
+        <label>Max operands
+          <input id="maxOperands" type="number" min="2" value="4">
+        </label>
+        <label>Max brackets
+          <input id="maxBrackets" type="number" min="1" value="2">
+        </label>
+      </div>
       <button id="startBtn" class="btn outline">Start</button>
+      <button id="stopBtn" class="btn outline" hidden>Stop Game</button>
+      <button id="pauseBtn" class="btn outline" hidden>Pause</button>
       <button id="restartBtn" class="btn outline" hidden>Play Again</button>
     </footer>
   </div>
