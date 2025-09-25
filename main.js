@@ -353,6 +353,14 @@ opEqCard.addEventListener('click', () => {
   opEqCard.setAttribute('aria-pressed', enabled.EQ ? 'true' : 'false');
 });
 
+/* Added: allow toggling IMP card when owned */
+opImpCard.addEventListener('click', () => {
+  if (!owned.IMP) return;
+  enabled.IMP = !enabled.IMP; saveEnabled();
+  opImpCard.classList.toggle('selected', enabled.IMP);
+  opImpCard.setAttribute('aria-pressed', enabled.IMP ? 'true' : 'false');
+});
+
 function loadAccount(name) {
   const acc = accounts[name];
   if (!acc) return;
