@@ -22,6 +22,9 @@ const buyImpBtn = document.getElementById('buyImpBtn');
 const impLegend = document.getElementById('impLegend');
 const impLegendText = document.getElementById('impLegendText');
 const opImpCard = document.getElementById('opImpCard');
+const opAndCard = document.getElementById('opAndCard');
+const opOrCard = document.getElementById('opOrCard');
+const opNotCard = document.getElementById('opNotCard');
 const openLoginBtn = document.getElementById('openLoginBtn');
 const openSignupBtn = document.getElementById('openSignupBtn');
 const acctLoginView = document.getElementById('acctLoginView');
@@ -50,11 +53,11 @@ let totalScore = Number(localStorage.getItem('logicTrainerTotalScore') || '0');
 let pointValue = 0;
 let paused = false;
 let owned = JSON.parse(localStorage.getItem('logicTrainerOwnedOps') || '{"IMP":false}');
-let enabled = JSON.parse(localStorage.getItem('logicTrainerEnabledOps') || '{"IMP":false}');
+let enabled = JSON.parse(localStorage.getItem('logicTrainerEnabledOps') || '{"IMP":true}');
 
-// extend defaults for new ops
+// extend defaults for new ops and core ops
 owned = Object.assign({ LE: false, EQ: false }, owned);
-enabled = Object.assign({ LE: false, EQ: false }, enabled);
+enabled = Object.assign({ LE: false, EQ: false, AND: true, OR: true, NOT: true, IMP: false }, enabled);
 
 // Accounts and current user loaded from localStorage
 let accounts = JSON.parse(localStorage.getItem('logicTrainerAccounts') || '{}');
@@ -111,6 +114,14 @@ function showHome() {
   opEqCard.hidden = !owned.EQ;
   opEqCard.classList.toggle('selected', !!enabled.EQ);
   opEqCard.setAttribute('aria-pressed', enabled.EQ ? 'true' : 'false');
+  
+  // core operator cards reflect enabled state
+  opAndCard.classList.toggle('selected', !!enabled.AND);
+  opAndCard.setAttribute('aria-pressed', enabled.AND ? 'true' : 'false');
+  opOrCard.classList.toggle('selected', !!enabled.OR);
+  opOrCard.setAttribute('aria-pressed', enabled.OR ? 'true' : 'false');
+  opNotCard.classList.toggle('selected', !!enabled.NOT);
+  opNotCard.setAttribute('aria-pressed', enabled.NOT ? 'true' : 'false');
 }
 
 function randInt(min, max) { return Math.floor(Math.random() * (max - min + 1)) + min; }
@@ -125,7 +136,7 @@ function evalBin(op, a, b) {
   return false;
 }
 
-function makeBracket(op, maxOperands) {
+function makeBracket(op, maxOperands, allowNot = true) {
   const forceBinary = (op === 'IMP' || op === 'LE' || op === 'EQ');
   const nArgs = forceBinary ? 2 : randInt(2, Math.max(2, maxOperands));
   const vals = Array.from({ length: nArgs }, () => randBool());
@@ -136,27 +147,30 @@ function makeBracket(op, maxOperands) {
   const info = map[op];
   const txtInside = vals.map(v => (v ? 'T' : 'F')).join(` <span class="op ${info.cls}">${info.sym}</span> `);
   let html = `(${txtInside})`, notUsed = false;
-  if (randBool()) { value = !value; html = `<span class="op not">¬</span>${html}`; notUsed = true; }
+  if (allowNot && enabled.NOT && randBool()) { value = !value; html = `<span class="op not">¬</span>${html}`; notUsed = true; }
   return { html, value, operatorCount: (nArgs - 1) + (notUsed ? 1 : 0) };
 }
 
 function generateExpression(maxOperands = 4, maxBrackets = 2) {
-  const canUseImp = owned.IMP && enabled.IMP;
-  const canUseLe = owned.LE && enabled.LE;
-  const canUseEq = owned.EQ && enabled.EQ;
-  const innerOps = ['AND','OR'].concat(canUseImp ? ['IMP'] : []);
-  if (canUseLe) innerOps.push('LE');
-  if (canUseEq) innerOps.push('EQ');
-  const joinOps = ['AND','OR'].concat(canUseImp ? ['IMP'] : []);
-  if (canUseLe) joinOps.push('LE');
-  if (canUseEq) joinOps.push('EQ');
-  const innerOp = innerOps[randInt(0, innerOps.length - 1)];
-  let joinOp = joinOps[randInt(0, joinOps.length - 1)];
+  // build lists from enabled operators (user-selected). Allow any quantity but ensure at least one.
+  const available = [];
+  if (enabled.AND) available.push('AND');
+  if (enabled.OR) available.push('OR');
+  if (enabled.IMP && owned.IMP) available.push('IMP');
+  if (enabled.LE && owned.LE) available.push('LE');
+  if (enabled.EQ && owned.EQ) available.push('EQ');
+  // If user disabled all, fallback to AND so generation can proceed
+  if (available.length === 0) available.push('AND');
+
+  // choose inner and join operators from the available set
+  const innerOp = available[randInt(0, available.length - 1)];
+  let joinOp = available[randInt(0, available.length - 1)];
+
   let nBrackets = (joinOp === 'IMP' || joinOp === 'LE' || joinOp === 'EQ') ? 2 : randInt(1, Math.max(1, maxBrackets));
   if (nBrackets === 1 && joinOp === 'IMP') nBrackets = 2;
   const parts = [], values = []; let opCount = 0;
   for (let i = 0; i < nBrackets; i++) {
-    const b = makeBracket(innerOp, maxOperands);
+    const b = makeBracket(innerOp, maxOperands, !!enabled.NOT);
     parts.push(b.html); values.push(b.value); opCount += b.operatorCount;
   }
   const map = { AND: { sym: '∧', cls: 'and' }, OR: { sym: '∨', cls: 'or' }, IMP: { sym: '→', cls: 'imp' } };
@@ -353,6 +367,23 @@ opEqCard.addEventListener('click', () => {
   opEqCard.setAttribute('aria-pressed', enabled.EQ ? 'true' : 'false');
 });
 
+/* toggle handlers for core operator cards */
+opAndCard.addEventListener('click', () => {
+  enabled.AND = !enabled.AND; saveEnabled();
+  opAndCard.classList.toggle('selected', enabled.AND);
+  opAndCard.setAttribute('aria-pressed', enabled.AND ? 'true' : 'false');
+});
+opOrCard.addEventListener('click', () => {
+  enabled.OR = !enabled.OR; saveEnabled();
+  opOrCard.classList.toggle('selected', enabled.OR);
+  opOrCard.setAttribute('aria-pressed', enabled.OR ? 'true' : 'false');
+});
+opNotCard.addEventListener('click', () => {
+  enabled.NOT = !enabled.NOT; saveEnabled();
+  opNotCard.classList.toggle('selected', enabled.NOT);
+  opNotCard.setAttribute('aria-pressed', enabled.NOT ? 'true' : 'false');
+});
+
 /* Added: allow toggling IMP card when owned */
 opImpCard.addEventListener('click', () => {
   if (!owned.IMP) return;
@@ -366,7 +397,7 @@ function loadAccount(name) {
   if (!acc) return;
   totalScore = Number(acc.total || 0);
   owned = Object.assign({ IMP:false, LE:false, EQ:false }, acc.owned || {});
-  enabled = Object.assign({ IMP:false, LE:false, EQ:false }, acc.enabled || {});
+  enabled = Object.assign({ IMP:false, LE:false, EQ:false, AND:true, OR:true, NOT:true }, acc.enabled || {});
   saveOwnership(); saveEnabled(); localStorage.setItem('logicTrainerTotalScore', String(totalScore));
   setCurrentUser(name);
   updateStats(); showHome();
@@ -375,7 +406,7 @@ function loadAccount(name) {
 function saveAccountState() {
   if (!currentUser) return;
   accounts[currentUser] = accounts[currentUser] || {};
-  accounts[currentUser].password = accounts[currentUser].password || accounts[currentUser].password; // keep existing
+  accounts[currentUser].password = accounts[currentUser].password || accounts[currentUser].password;
   accounts[currentUser].total = Number(totalScore);
   accounts[currentUser].owned = owned;
   accounts[currentUser].enabled = enabled;
